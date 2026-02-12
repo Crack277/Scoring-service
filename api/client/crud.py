@@ -1,11 +1,10 @@
-from fastapi import BackgroundTasks
-from fastapi_cache import FastAPICache
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.client.schemas import ClientCreate, ClientUpdate
-from src.config import settings
+from api.utils.task import send_email_newsletter
 from src.models import Client
 
 
@@ -23,25 +22,22 @@ async def get_client(client_id: int, session: AsyncSession) -> Client | None:
 
 
 async def create_client(
-    # background_tasks: BackgroundTasks,
     client_create: ClientCreate,
     session: AsyncSession,
 ) -> Client:
     """Создаём клиента."""
-    # if background_tasks:
-    #     background_tasks.add_task(
-    #         FastAPICache.clear,
-    #         namespace=settings.cache.namespace.users,
-    #     )
-    # else:
-    #     await FastAPICache.clear(
-    #         namespace=settings.cache.namespace.users,
-    #     )
+    stmt = select(Client).where(Client.email == client_create.email)
+    result = await session.scalar(stmt)
+    if result is None:
+        send_email_newsletter(client_name=client_create.name)
+        client = Client(**client_create.model_dump())
+        session.add(client)
+        await session.commit()
+        return client
 
-    client = Client(**client_create.model_dump())
-    session.add(client)
-    await session.commit()
-    return client
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail="This email is already occupied",
+    )
 
 
 async def update_client(
