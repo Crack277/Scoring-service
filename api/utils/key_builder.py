@@ -6,7 +6,7 @@ from typing import Any, Callable, Tuple, Dict, Optional
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
 
-def users_key_builder(
+async def users_key_builder(
     func: Callable[..., Any],
     namespace: str = "",
     *,
