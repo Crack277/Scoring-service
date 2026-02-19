@@ -4,6 +4,7 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+
 # @pytest.mark.unit
 class TestDatabaseHelper:
     """Тесты для DatabaseHelper"""
@@ -72,6 +73,7 @@ class TestDatabaseHelper:
         mock_session.commit.assert_called_once()
         mock_session.close.assert_called_once()
         mock_session.rollback.assert_not_called()
+
 
 # @pytest.mark.unit
 class TestDatabaseHelperObject:

@@ -36,7 +36,8 @@ async def create_client(
         return client
 
     raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="This email is already occupied",
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="This email is already occupied",
     )
 
 
